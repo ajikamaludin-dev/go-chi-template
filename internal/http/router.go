@@ -7,6 +7,8 @@ import (
 	chimw "github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+
 	"github.com/aji/chi-go-template/internal/config"
 	"github.com/aji/chi-go-template/internal/http/middleware"
 	"github.com/aji/chi-go-template/internal/observability"
@@ -56,5 +58,5 @@ func NewRouter(d RouterDeps) http.Handler {
 		})
 	})
 
-	return r
+	return otelhttp.NewHandler(r, "chi-go-template")
 }

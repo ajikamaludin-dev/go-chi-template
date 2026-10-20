@@ -4,7 +4,7 @@ Go web service template built on `chi` router, with separate web and queue worke
 
 ## Stack
 
-- Go 1.24
+- Go 1.26
 - chi v5
 - sqlx + golang-migrate (mysql/postgres/sqlite)
 - asynq (Redis) for queue/worker
@@ -35,6 +35,7 @@ migrations
 make init MODULE=github.com/your-org/your-service
 # or: bash scripts/init.sh github.com/your-org/your-service
 ```
+
 3. Update repo name/remote as needed. Module path must match the public repo URL if you publish.
 
 ## Quick start
@@ -61,14 +62,13 @@ go test ./...
 
 ## Service access (docker compose)
 
-| Service | URL | Credentials |
-|---|---|---|
-| Web API | http://localhost:8080 | - |
-| Metrics | http://localhost:8080/metrics | - |
-| Health | http://localhost:8080/healthz | - |
-| Jaeger (traces) | http://localhost:16686 | - |
-| Prometheus (metrics) | http://localhost:9090 | - |
-| Grafana (dashboard) | http://localhost:3000 | admin / admin |
-| OTel Collector | localhost:4317 (gRPC) | - |
-| MariaDB | localhost:3306 | app / secret |
-| Redis | localhost:6379 | - |
+| Service                   | URL                           | Credentials  |
+| ------------------------- | ----------------------------- | ------------ |
+| Web API                   | http://localhost:8080         | -            |
+| Metrics                   | http://localhost:8080/metrics | -            |
+| Health                    | http://localhost:8080/healthz | -            |
+| OTel Collector (optional) | localhost:4317 (gRPC)         | -            |
+| MariaDB                   | localhost:3306                | app / secret |
+| Redis                     | localhost:6379                | -            |
+
+Observability services (Jaeger, Prometheus, Grafana, OTEL collector) are optional; setup steps in `.ai-docs/backend/observability.md`.

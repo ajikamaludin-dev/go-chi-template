@@ -8,14 +8,11 @@ services:
     ports:
       - "8080:8080"
     env_file: .env
-    environment:
-      OTEL_ENDPOINT: otel-collector:4317
     volumes:
       - ./storage/logs:/app/storage/logs
     depends_on:
       - mariadb
       - redis
-      - otel-collector
     restart: unless-stopped
 
   worker:
@@ -25,14 +22,11 @@ services:
         TARGET: worker
         PROJECT_NAME: ${COMPOSE_PROJECT_NAME:-chi-go-template}
     env_file: .env
-    environment:
-      OTEL_ENDPOINT: otel-collector:4317
     volumes:
       - ./storage/logs:/app/storage/logs
     depends_on:
       - mariadb
       - redis
-      - otel-collector
     restart: unless-stopped
 
   mariadb:
@@ -56,48 +50,6 @@ services:
       - redis_data:/data
     restart: unless-stopped
 
-  otel-collector:
-    image: otel/opentelemetry-collector-contrib:latest
-    command: ["--config=/etc/otel-collector-config.yaml"]
-    volumes:
-      - ./deploy/otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
-    ports:
-      - "4317:4317"
-      - "4318:4318"
-      - "8889:8889"
-    depends_on:
-      - jaeger
-    restart: unless-stopped
-
-  jaeger:
-    image: jaegertracing/all-in-one:latest
-    environment:
-      COLLECTOR_OTLP_ENABLED: "true"
-    ports:
-      - "16686:16686"
-      - "4319:4317"
-    restart: unless-stopped
-
-  prometheus:
-    image: prom/prometheus:v3.13.4
-    volumes:
-      - ./deploy/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-    ports:
-      - "9090:9090"
-    restart: unless-stopped
-
-  grafana:
-    image: grafana/grafana:13.2.4
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./deploy/grafana/provisioning:/etc/grafana/provisioning:ro
-    environment:
-      GF_SECURITY_ADMIN_PASSWORD: admin
-    depends_on:
-      - prometheus
-      - jaeger
-    restart: unless-stopped
 
 volumes:
   mariadb_data:

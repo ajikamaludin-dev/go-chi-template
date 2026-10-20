@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/signal"
@@ -27,6 +28,11 @@ func main() {
 		os.Exit(1)
 	}
 
+	shutdown, err := observability.InitTracing(context.Background(), cfg.App.Name+"-worker", cfg.Tracing.Endpoint, cfg.Tracing.Insecure)
+	if err != nil {
+		ch.Error.Error("tracing init failed", observability.Err(err))
+	}
+
 	srv := queue.NewServer(cfg.Redis.Addr, cfg.Redis.Password, cfg.Redis.DB, 10)
 	mux := queue.NewMux()
 
@@ -44,4 +50,7 @@ func main() {
 	<-quit
 	ch.App.Info("shutting down worker")
 	srv.Shutdown()
+	if shutdown != nil {
+		_ = shutdown(context.Background())
+	}
 }
