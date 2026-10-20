@@ -38,7 +38,7 @@ func RequestLogger(log *slog.Logger) func(http.Handler) http.Handler {
 	}
 }
 
-var sensitiveRe = regexp.MustCompile(`(?i)("?(password|token|secret|api[_-]?key|access[_-]?token|refresh[_-]?token|authorization)"?\s*[:=]\s*)"?\[^"\]*"?`)
+var sensitiveRe = regexp.MustCompile(`(?i)("?(password|token|secret|api[_-]?key|access[_-]?token|refresh[_-]?token|authorization)"?\s*[:=]\s*)"?[^",}\s]*"?`)
 
 func redact(s string) string {
 	return sensitiveRe.ReplaceAllString(s, `${1}"***"`)

@@ -30,7 +30,7 @@ func NewRouter(d RouterDeps) http.Handler {
 		r.Use(middleware.RequestLogger(d.Logger.App))
 	}
 
-	if d.Cfg.App.Env == "development" {
+	if d.Cfg != nil && d.Cfg.App.Env == "development" {
 		r.Use(cors.Handler(cors.Options{
 			AllowedOrigins: []string{"*"},
 			AllowedMethods: []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
