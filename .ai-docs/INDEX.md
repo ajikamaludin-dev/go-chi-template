@@ -11,6 +11,9 @@ Last verified: 2026-10-20.
 | Understand system | architecture/system-overview.md |
 | Backend file map | backend/backend-map.md |
 | Write code patterns | patterns/coding-patterns.md |
+| CRUD pattern | patterns/crud.md |
+| Caching pattern | patterns/caching.md |
+| Third-party integration | backend/external-integration.md |
 | Add feature step-by-step | workflows/new-feature-recipe.md |
 | Debug | workflows/debugging-playbook.md |
 | Write/run tests | testing/testing-strategy.md |
