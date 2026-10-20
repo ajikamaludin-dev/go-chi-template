@@ -20,6 +20,7 @@ Last verified: 2026-10-20.
 | Jobs/queue/scheduler | backend/jobs-and-scheduler.md |
 | Migrations | backend/migrations.md |
 | Observability (metrics/tracing/logs) | backend/observability.md |
+| Dependencies | dependencies/go-packages.md |
 | AI workflow | workflows/ai-development-workflow.md |
 
 ## Directory map
