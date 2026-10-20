@@ -14,6 +14,7 @@
 | go.opentelemetry.io/otel | v1.47.0 | Tracing SDK |
 | go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc | v1.35.0 | OTLP exporter |
 | go.opentelemetry.io/otel/sdk | v1.47.0 | Tracing SDK |
+| go.uber.org/zap | v1.28.0 | Structured logging |
 | gopkg.in/natefinch/lumberjack.v2 | v2.2.1 | Log rotation |
 
 ## Checks

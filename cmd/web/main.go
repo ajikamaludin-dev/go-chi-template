@@ -11,6 +11,8 @@ import (
 	"github.com/aji/chi-go-template/internal/config"
 	httpx "github.com/aji/chi-go-template/internal/http"
 	"github.com/aji/chi-go-template/internal/observability"
+
+	"go.uber.org/zap"
 )
 
 func main() {
@@ -32,7 +34,7 @@ func main() {
 
 	shutdown, err := observability.InitTracing(context.Background(), cfg.App.Name, cfg.Tracing.Endpoint, cfg.Tracing.Insecure)
 	if err != nil {
-		ch.Error.Error("tracing init failed", observability.Err(err))
+		ch.Error.Error("tracing init failed", zap.Error(err))
 	}
 
 	router := httpx.NewRouter(httpx.RouterDeps{
@@ -45,7 +47,7 @@ func main() {
 
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && !httpx.IsShutdown(err) {
-			ch.Error.Error("server error", observability.Err(err))
+			ch.Error.Error("server error", zap.Error(err))
 			os.Exit(1)
 		}
 	}()
@@ -58,7 +60,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	if err := srv.Shutdown(ctx); err != nil {
-		ch.Error.Error("shutdown error", observability.Err(err))
+		ch.Error.Error("shutdown error", zap.Error(err))
 	}
 	if shutdown != nil {
 		_ = shutdown(ctx)

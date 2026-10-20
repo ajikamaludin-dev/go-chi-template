@@ -1,33 +1,47 @@
 package observability
 
 import (
-	"fmt"
-	"io"
-	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 type Channels struct {
-	App   *slog.Logger
-	Error *slog.Logger
-	Audit *slog.Logger
+	App   *zap.Logger
+	Error *zap.Logger
+	Audit *zap.Logger
 }
 
 func NewLogger(dir, level string, maxSizeMB, maxBackups, maxAgeDays int, service string) (*Channels, error) {
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return nil, err
 	}
-	lvl := parseLevel(level)
+	lvl := parseZapLevel(level)
+
+	encCfg := zapcore.EncoderConfig{
+		TimeKey:        "time",
+		LevelKey:       "level",
+		NameKey:        "logger",
+		CallerKey:      "caller",
+		MessageKey:     "msg",
+		StacktraceKey:  "stacktrace",
+		LineEnding:     zapcore.DefaultLineEnding,
+		EncodeLevel:    zapcore.LowercaseLevelEncoder,
+		EncodeTime:     zapcore.ISO8601TimeEncoder,
+		EncodeDuration: zapcore.SecondsDurationEncoder,
+		EncodeCaller:   zapcore.ShortCallerEncoder,
+	}
 
 	prefix := ""
 	if service != "" {
 		prefix = service + "-"
 	}
-	makeLogger := func(filename string) *slog.Logger {
+
+	makeLogger := func(filename string) *zap.Logger {
 		w := &lumberjack.Logger{
 			Filename:   filepath.Join(dir, prefix+filename),
 			MaxSize:    maxSizeMB,
@@ -35,9 +49,12 @@ func NewLogger(dir, level string, maxSizeMB, maxBackups, maxAgeDays int, service
 			MaxAge:     maxAgeDays,
 			Compress:   true,
 		}
-		// tee to stdout in dev-friendly manner
-		h := slog.NewJSONHandler(io.MultiWriter(os.Stdout, w), &slog.HandlerOptions{Level: lvl})
-		return slog.New(h)
+		core := zapcore.NewCore(
+			zapcore.NewJSONEncoder(encCfg),
+			zapcore.AddSync(w),
+			lvl,
+		)
+		return zap.New(core, zap.AddCaller(), zap.AddStacktrace(zapcore.ErrorLevel))
 	}
 
 	return &Channels{
@@ -47,25 +64,15 @@ func NewLogger(dir, level string, maxSizeMB, maxBackups, maxAgeDays int, service
 	}, nil
 }
 
-func parseLevel(s string) slog.Level {
+func parseZapLevel(s string) zapcore.Level {
 	switch strings.ToLower(s) {
 	case "debug":
-		return slog.LevelDebug
+		return zapcore.DebugLevel
 	case "warn", "warning":
-		return slog.LevelWarn
+		return zapcore.WarnLevel
 	case "error":
-		return slog.LevelError
+		return zapcore.ErrorLevel
 	default:
-		return slog.LevelInfo
+		return zapcore.InfoLevel
 	}
 }
-
-// Err wraps error into slog attribute
-func Err(err error) slog.Attr {
-	if err == nil {
-		return slog.String("error", "")
-	}
-	return slog.String("error", err.Error())
-}
-
-var _ = fmt.Sprintf

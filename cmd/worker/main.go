@@ -10,6 +10,8 @@ import (
 	"github.com/aji/chi-go-template/internal/config"
 	"github.com/aji/chi-go-template/internal/observability"
 	"github.com/aji/chi-go-template/internal/queue"
+
+	"go.uber.org/zap"
 )
 
 func main() {
@@ -30,7 +32,7 @@ func main() {
 
 	shutdown, err := observability.InitTracing(context.Background(), cfg.App.Name+"-worker", cfg.Tracing.Endpoint, cfg.Tracing.Insecure)
 	if err != nil {
-		ch.Error.Error("tracing init failed", observability.Err(err))
+		ch.Error.Error("tracing init failed", zap.Error(err))
 	}
 
 	srv := queue.NewServer(cfg.Redis.Addr, cfg.Redis.Password, cfg.Redis.DB, 10)
@@ -38,7 +40,7 @@ func main() {
 
 	go func() {
 		if err := srv.Run(mux); err != nil {
-			ch.Error.Error("worker error", observability.Err(err))
+			ch.Error.Error("worker error", zap.Error(err))
 			os.Exit(1)
 		}
 	}()

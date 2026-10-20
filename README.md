@@ -9,7 +9,7 @@ Go web service template built on `chi` router, with separate web and queue worke
 - sqlx + golang-migrate (mysql/postgres/sqlite)
 - asynq (Redis) for queue/worker
 - cleanenv config
-- slog + lumberjack (rotating logs), Prometheus metrics, OpenTelemetry tracing
+- zap + lumberjack (rotating logs), Prometheus metrics, OpenTelemetry tracing
 
 ## Layout
 

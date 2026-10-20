@@ -7,10 +7,11 @@ import (
 	"time"
 
 	chimw "github.com/go-chi/chi/v5/middleware"
-	"log/slog"
+
+	"go.uber.org/zap"
 )
 
-func RequestLogger(log *slog.Logger) func(http.Handler) http.Handler {
+func RequestLogger(log *zap.Logger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			start := time.Now()
@@ -25,13 +26,13 @@ func RequestLogger(log *slog.Logger) func(http.Handler) http.Handler {
 					body = body[:512] + "...(truncated)"
 				}
 				log.Info("http request",
-					slog.String("method", r.Method),
-					slog.String("path", r.URL.RequestURI()),
-					slog.Int("status", ww.Status()),
-					slog.Duration("duration", time.Since(start)),
-					slog.String("remote", r.RemoteAddr),
-					slog.Int("bytes", ww.BytesWritten()),
-					slog.String("response", body),
+					zap.String("method", r.Method),
+					zap.String("path", r.URL.RequestURI()),
+					zap.Int("status", ww.Status()),
+					zap.Duration("duration", time.Since(start)),
+					zap.String("remote", r.RemoteAddr),
+					zap.Int("bytes", ww.BytesWritten()),
+					zap.String("response", body),
 				)
 			}
 		})
