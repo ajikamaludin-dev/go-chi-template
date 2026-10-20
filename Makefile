@@ -1,6 +1,6 @@
 PROJECT_NAME ?= chi-go-template
 
-.PHONY: init build build-web build-worker run web worker test vet fmt
+.PHONY: init build build-web build-worker run web worker test vet fmt migrate-up migrate-down
 
 init:
 	@bash scripts/init.sh $(MODULE)
@@ -30,3 +30,9 @@ vet:
 
 fmt:
 	gofmt -w .
+
+migrate-up:
+	go run ./cmd/migrate up
+
+migrate-down:
+	go run ./cmd/migrate down

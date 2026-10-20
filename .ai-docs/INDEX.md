@@ -18,6 +18,7 @@ Last verified: 2026-10-20.
 | Debug | workflows/debugging-playbook.md |
 | Write/run tests | testing/testing-strategy.md |
 | Jobs/queue/scheduler | backend/jobs-and-scheduler.md |
+| Migrations | backend/migrations.md |
 | Observability (metrics/tracing/logs) | backend/observability.md |
 | AI workflow | workflows/ai-development-workflow.md |
 
