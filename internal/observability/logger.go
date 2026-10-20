@@ -17,15 +17,19 @@ type Channels struct {
 	Audit *slog.Logger
 }
 
-func NewLogger(dir, level string, maxSizeMB, maxBackups, maxAgeDays int) (*Channels, error) {
+func NewLogger(dir, level string, maxSizeMB, maxBackups, maxAgeDays int, service string) (*Channels, error) {
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return nil, err
 	}
 	lvl := parseLevel(level)
 
+	prefix := ""
+	if service != "" {
+		prefix = service + "-"
+	}
 	makeLogger := func(filename string) *slog.Logger {
 		w := &lumberjack.Logger{
-			Filename:   filepath.Join(dir, filename),
+			Filename:   filepath.Join(dir, prefix+filename),
 			MaxSize:    maxSizeMB,
 			MaxBackups: maxBackups,
 			MaxAge:     maxAgeDays,

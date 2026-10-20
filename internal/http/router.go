@@ -24,6 +24,9 @@ func NewRouter(d RouterDeps) http.Handler {
 	r.Use(middleware.Recoverer)
 	r.Use(chimw.RequestID)
 	r.Use(chimw.Compress(5))
+	if d.Logger != nil {
+		r.Use(middleware.RequestLogger(d.Logger.App))
+	}
 
 	if d.Cfg.App.Env == "development" {
 		r.Use(cors.Handler(cors.Options{

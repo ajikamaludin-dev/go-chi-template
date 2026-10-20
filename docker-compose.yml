@@ -4,6 +4,7 @@ services:
       context: .
       args:
         TARGET: web
+        PROJECT_NAME: ${COMPOSE_PROJECT_NAME:-chi-go-template}
     ports:
       - "8080:8080"
     env_file: .env
@@ -22,6 +23,7 @@ services:
       context: .
       args:
         TARGET: worker
+        PROJECT_NAME: ${COMPOSE_PROJECT_NAME:-chi-go-template}
     env_file: .env
     environment:
       OTEL_ENDPOINT: otel-collector:4317

@@ -21,7 +21,7 @@ func main() {
 		}
 	}
 
-	ch, err := observability.NewLogger(cfg.Logging.Dir, cfg.Logging.Level, cfg.Logging.MaxSizeMB, cfg.Logging.MaxBackups, cfg.Logging.MaxAgeDays)
+	ch, err := observability.NewLogger(cfg.Logging.Dir, cfg.Logging.Level, cfg.Logging.MaxSizeMB, cfg.Logging.MaxBackups, cfg.Logging.MaxAgeDays, "worker")
 	if err != nil {
 		fmt.Println("logger error:", err)
 		os.Exit(1)
