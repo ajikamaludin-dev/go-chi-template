@@ -10,14 +10,17 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 
 	"github.com/aji/chi-go-template/internal/config"
+	"github.com/aji/chi-go-template/internal/http/handler/jobs"
 	"github.com/aji/chi-go-template/internal/http/middleware"
 	"github.com/aji/chi-go-template/internal/observability"
+	"github.com/aji/chi-go-template/internal/service"
 )
 
 type RouterDeps struct {
-	Cfg     *config.Config
-	Logger  *observability.Channels
-	Metrics bool
+	Cfg        *config.Config
+	Logger     *observability.Channels
+	Metrics    bool
+	JobService *service.JobService
 }
 
 func NewRouter(d RouterDeps) http.Handler {
@@ -56,6 +59,11 @@ func NewRouter(d RouterDeps) http.Handler {
 			w.Header().Set("Content-Type", "application/json")
 			w.Write([]byte(`{"message":"pong"}`))
 		})
+
+		if d.JobService != nil {
+			h := jobs.New(d.JobService)
+			r.Post("/jobs/example", h.EnqueueExample)
+		}
 	})
 
 	return otelhttp.NewHandler(r, "chi-go-template")

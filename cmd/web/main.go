@@ -11,6 +11,8 @@ import (
 	"github.com/aji/chi-go-template/internal/config"
 	httpx "github.com/aji/chi-go-template/internal/http"
 	"github.com/aji/chi-go-template/internal/observability"
+	"github.com/aji/chi-go-template/internal/queue"
+	"github.com/aji/chi-go-template/internal/service"
 
 	"go.uber.org/zap"
 )
@@ -37,10 +39,14 @@ func main() {
 		ch.Error.Error("tracing init failed", zap.Error(err))
 	}
 
+	queueClient := queue.NewClient(cfg.Redis.Addr, cfg.Redis.Password, cfg.Redis.DB)
+	defer queueClient.Close()
+
 	router := httpx.NewRouter(httpx.RouterDeps{
-		Cfg:     cfg,
-		Logger:  ch,
-		Metrics: cfg.Metrics.Enabled,
+		Cfg:        cfg,
+		Logger:     ch,
+		Metrics:    cfg.Metrics.Enabled,
+		JobService: service.NewJobService(queueClient),
 	})
 
 	srv := httpx.NewServer(fmt.Sprintf(":%d", cfg.App.Port), router)
